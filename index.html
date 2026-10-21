@@ -5,34 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Vua Đổ Thạch</title>
   
-  <!-- Khai báo Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <!-- Cấu hình PWA -->
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#161b22">
-
-  <!-- Meta Tags đặc thù cho iOS (iPhone/iPad) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Vua Đổ Thạch">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
   <div id="game-wrapper">
-    <!-- Giao diện game giữ nguyên -->
+    <header>
+      <div class="title">🪨 Vua Đổ Thạch</div>
+      <div class="header-right">
+        <button id="btn-open-shop" class="icon-btn">🛒 Cửa Hàng</button>
+        <div class="cash-badge" id="cash-display">$1,000</div>
+      </div>
+    </header>
+
+    <!-- Thẻ Canvas bắt buộc để vẽ game -->
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="status-panel" id="status-text">
+      Hãy chọn mua một viên <span>Nguyên Thạch Thô</span> để bắt đầu!
+    </div>
+
+    <div class="controls">
+      <button id="btn-buy-low">Mua Đá Thô ($200)</button>
+      <button id="btn-buy-high">Mua Đá Cấp Cao ($600)</button>
+      <button id="btn-mode" disabled>Chế độ: Soi Đèn 🔦</button>
+      <button id="btn-cut" disabled>Thực Hiện Cắt 🪚</button>
+      <button id="btn-sell" class="primary full-width" disabled>Định Giá & Bán Ngọc 💰</button>
+    </div>
   </div>
 
-  <!-- Đăng ký Service Worker -->
+  <!-- Modal Cửa Hàng Nâng Cấp -->
+  <div id="shop-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🛒 Cửa Hàng Nâng Cấp Công Cụ</h3>
+        <button id="btn-close-shop" class="close-btn">✖</button>
+      </div>
+      <div id="shop-items-list" class="shop-list"></div>
+    </div>
+  </div>
+
+  <!-- Đăng ký Service Worker PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('Service Worker PWA đã kích hoạt:', reg.scope))
-          .catch(err => console.error('Lỗi đăng ký Service Worker:', err));
+          .then(reg => console.log('PWA Service Worker OK:', reg.scope))
+          .catch(err => console.error('PWA Error:', err));
       });
     }
   </script>
-  <script type="module" src="js/main.js"></script>
+
+  <!-- Load Game Loop -->
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
