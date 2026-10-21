@@ -3,17 +3,19 @@ export class Stone {
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.cost = tierConfig.cost;
-    this.tierName = tierConfig.name;
+    this.cost = tierConfig ? tierConfig.cost : 200;
+    this.tierName = tierConfig ? tierConfig.name : 'Đá Thô';
     this.isSliced = false;
 
+    // Phẩm chất ngọc
+    const probs = (tierConfig && tierConfig.probabilities) ? tierConfig.probabilities : { 0: 0.55, 1: 0.35, 2: 0.08, 3: 0.02 };
     const rand = Math.random();
     let quality = 0;
-    if (rand < tierConfig.probabilities[3]) {
+    if (rand < probs[3]) {
       quality = 3;
-    } else if (rand < tierConfig.probabilities[3] + tierConfig.probabilities[2]) {
+    } else if (rand < probs[3] + probs[2]) {
       quality = 2;
-    } else if (rand < tierConfig.probabilities[3] + tierConfig.probabilities[2] + tierConfig.probabilities[1]) {
+    } else if (rand < probs[3] + probs[2] + probs[1]) {
       quality = 1;
     } else {
       quality = 0;
@@ -34,27 +36,9 @@ export class Stone {
     };
   }
 
-  // Bán ngọc kết hợp hệ số nhân từ Lưỡi Cưa
-  getSellingPrice(sawBonusMultiplier = 1.0) {
+  getSellingPrice() {
     const gem = this.colors[this.gemCore.quality];
-    return Math.round(this.cost * gem.priceMultiplier * sawBonusMultiplier);
-  }
-
-  // Dự báo chất lượng khi sở hữu Kính Hiển Vi
-  getMicroscopeHint(microscopeLevel) {
-    if (microscopeLevel === 0) return '';
-    const q = this.gemCore.quality;
-
-    if (microscopeLevel === 1) {
-      if (q === 0) return '🔬 Thẩm định: Bề mặt khô, ít tiềm năng.';
-      if (q === 1) return '🔬 Thẩm định: Cấu trúc có vệt xanh mờ.';
-      return '🔬 Thẩm định: Năng lượng ngọc rất mạnh!';
-    }
-
-    if (microscopeLevel === 2) {
-      return `🔬 Thẩm định chính xác: Phẩm chất dự kiến [${this.colors[q].name}]!`;
-    }
-    return '';
+    return Math.round(this.cost * gem.priceMultiplier);
   }
 
   slice() {
@@ -91,4 +75,27 @@ export class Stone {
       const gemY = this.y + this.gemCore.offsetY;
       const grad = ctx.createRadialGradient(
         gemX, gemY, 5,
-        gemX,
+        gemX, gemY, this.gemCore.size
+      );
+      grad.addColorStop(0, '#ffffffcc');
+      grad.addColorStop(0.4, gem.glow);
+      grad.addColorStop(1, gem.core);
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(gemX, gemY, this.gemCore.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      const shineGrad = ctx.createLinearGradient(this.x - this.radius, this.y - this.radius, this.x + this.radius, this.y + this.radius);
+      shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+      shineGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.0)');
+      shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+
+      ctx.fillStyle = shineGrad;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius - 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
